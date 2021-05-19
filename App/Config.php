@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 
@@ -14,16 +13,10 @@ if ('' === $_SERVER['DOCUMENT_ROOT']){
 
 /**
  * Class Config
- * @package App
  * Класс конфигураций
  */
 class Config
 {
-    /**
-     * @const Путь к конфигам
-     */
-    private const CONFIG_PATH =  ROOT_DIR . '/App/Config';
-
     /**
      * Подключаемые при инициализации настройки
      * @var array
@@ -34,6 +27,7 @@ class Config
 
     /**
      * Инициализация класса с настройками
+     *
      */
     public static function init(): void
     {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Http;
 
-use App\Middlewares\SessionMiddleware;
-use Core\Exceptions\RouteException;
-use Core\Routing\Router;
+use App;
+use App\Core\Exceptions\RouteException;
+use App\Router;
 
 /**
  * Class Kernel
@@ -62,7 +62,7 @@ class Kernel
      */
     public function route(Request $request): Kernel
     {
-        $router = new Router($request->uri, $request->method);
+        $router = new Router($request->uri);
 
         try{
             $this->routeMiddleware = $router->start($request->uri);
@@ -106,7 +106,6 @@ class Kernel
             foreach ($middlewares as $key=>&$middleware){
                 $next = $this->middleware[$key + 1] ?? null;
                 $middleware = $next ? new $middleware(new $next()) : new $middleware(null);
-                //TODO: реализовать формирование списка middleware
             }
 
             $middlewares[0]($request, $response);

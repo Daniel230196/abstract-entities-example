@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 require_once 'App/helpers/helpers.php';
 
+use App\Core\Connection;
 use Http\Request;
 use function App\helpers\view;
 
@@ -22,9 +23,9 @@ abstract class BaseController implements ControllerInterface
     protected array $middleware;
 
     /**
-     * @var EntityManager
+     * @var Connection
      */
-    protected EntityManager $em;
+    protected Connection $em;
 
     /**
      * @var Request
@@ -36,7 +37,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function __construct()
     {
-        $this->em = Connection::getEntityManager();
+        $this->em = Connection::getInstance();
     }
 
     public function setRequest(Request $request)

@@ -2,23 +2,17 @@
 declare(strict_types=1);
 
 
-namespace Core\Routing;
+namespace App;
 
 
 use App\Controllers\ControllerInterface;
-use App\Middlewares\MiddlewareInterface;
-use Core\Exceptions\RouteException;
+use App\Controllers\EntityController;
+use App\Core\Exceptions\RouteException;
 
 class Router
 {
 
-    /**
-     * Массив вида Паттерн урл => Имя класса стратегии роутинга
-     */
-    public const STRATEGIES = [
-        ApiV1Strategy::URI_PATTERN => ApiV1Strategy::class ,
-        ApiV2Strategy::URI_PATTERN => ApiV2Strategy::class
-    ];
+
 
     /**
      * Инстанс и метод контроллера
@@ -26,12 +20,16 @@ class Router
      */
     private array $statement;
 
-    /**
-     * Стратегия для определения маршрутов
-     * @var RoutingStrategy
-     *
-     */
-    private RoutingStrategy $strategy;
+    private const DEFAULT_CONTROLLER = EntityController::class;
+
+    private array $routes = [
+      EntityController::class => [
+          'create',
+          'find',
+          'method'
+      ]
+    ];
+
 
     /**
      * Метод запроса
@@ -40,10 +38,9 @@ class Router
     private string $requestMethod;
 
 
-    public function __construct(string $requestUri, string $requestMethod)
+    public function __construct(string $requestUri)
     {
-        $this->strategy = $this->getStrategy($requestUri);
-        $this->requestMethod = $requestMethod;
+
     }
 
     /**
@@ -54,10 +51,12 @@ class Router
      */
     public function start(string $uri): array
     {
-        $controller = $this->strategy->controller($uri);
-        $method = $this->strategy->getMethod($this->requestMethod, $uri);
-        $this->statement['controller'] = $controller;
-        $this->statement['action'] = $method;
+        $controller                     =  $this->controller($uri);
+        $method                         = $this->method($uri, $this->routes[get_class($controller)]);
+        var_dump($method);
+        $this->statement['controller']  = $controller;
+        $this->statement['action']      = $method;
+
 
         if ((new \ReflectionClass($controller))->hasMethod($method) && (new \ReflectionMethod($controller, $method))->isPublic()) {
 
@@ -84,7 +83,7 @@ class Router
     private function getMiddlewares(array $params): array
     {
         if (count($params) !== 2 || !($params['controller'] instanceof ControllerInterface)) {
-            throw new RouteException('invalid middleware params', 406);
+            throw new RouteException('invalid middleware params', 400);
         }
 
         $middleware = $params['controller']->middleware();
@@ -111,24 +110,36 @@ class Router
         return [];
     }
 
-    /**
-     * Определение стратегии роутинга по паттерну роута api
-     * @param string $uri
-     * @return RoutingStrategy
-     */
-    private function getStrategy(string $uri): RoutingStrategy
+    private function method(string $uri, array $actions): string
     {
-        $patterns = array_keys(self::STRATEGIES);
-        $strategy = CommonStrategy::class;
+        $method   = 'default';
 
-        foreach ($patterns as $pattern){
+        $uriParts = explode('/', trim($uri,'/'));
 
-            if(1 === preg_match($pattern, $uri)){
-                $strategy = self::STRATEGIES[$pattern];
-            }
+        if(isset($uriParts[1])){
+            $method = strtolower($uriParts[1]);
+            $method =  in_array($method, $actions) ? $method : 'default';
         }
 
-        return new $strategy($uri);
+        return $method;
     }
 
+    private function controller(string $uri): ControllerInterface
+    {
+        $default   = self::DEFAULT_CONTROLLER;
+        $name      =  ucfirst(strtolower(explode('/', trim($uri,'/'))[0])) . 'Controller';
+        $className = CONTROLLER_NAMESPACE . $name;
+
+        return $this->controllerCheck($name) && class_exists($className) ? new $className() : new $default();
+    }
+
+    /**
+     * Проверка наличия файла контроллера
+     * @param string $contrName
+     * @return bool
+     */
+    private function controllerCheck(string $contrName): bool
+    {
+        return file_exists(CONTROLLER_PATH . $contrName . '.php');
+    }
 }

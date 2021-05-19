@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Core;
+namespace App\Core;
 
 
 use App\Config;
@@ -19,6 +19,7 @@ class Connection
 {
     use SingletonTrait;
 
+    private string $dbName;
     private static \PDO $pdo;
     private static string $sourcePath = ROOT_DIR . 'App/Models';
 
@@ -26,10 +27,17 @@ class Connection
     {
           $confPdo = Config::database('mysql');
            try {
-               self::$pdo = new \PDO($confPdo['host'], $confPdo['user'], $confPdo['password'], [\PDO::ATTR_EMULATE_PREPARES => true]);
+               self::$pdo = new \PDO('mysql:host=' . $confPdo['host'] . ';' . $confPdo['dbname'] ,$confPdo['user'], $confPdo['password'], [\PDO::ATTR_EMULATE_PREPARES => true, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+               $this->dbName = $confPdo['dbname'];
            } catch (\PDOException $exception) {
                echo $exception->getMessage();
+               exit();
            }
+    }
+
+    public function getDatabaseName(): string
+    {
+        return $this->dbName;
     }
 
     /**

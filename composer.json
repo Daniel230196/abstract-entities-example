@@ -6,5 +6,26 @@
             "email": "dan-n-70s@mail.ru"
         }
     ],
-    "require": {}
+    "require": {
+        "fzaninotto/faker": "^1.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Http\\": "Http",
+            "App\\": "App",
+            "App\\helpers\\": "App/helpers",
+            "App\\Views\\": "App/Views",
+            "App\\Controllers\\": "App/Controllers",
+            "App\\Middlewares\\": "App/Middlewares",
+            "App\\Models\\": "App/Models",
+            "App\\Core\\": "App/Core",
+            "App\\Core\\Traits\\" : "App/Core/Traits",
+            "App\\Core\\Exceptions\\": "App/Core/Exceptions",
+            "Services\\" : "Services",
+            "Services\\Interfaces\\" : "Services/Interfaces"
+        },
+        "files": [
+            "App/helpers/helpers.php"
+        ]
+    }
 }

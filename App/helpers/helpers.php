@@ -31,5 +31,5 @@ function view(string $className, ?array $data = [])
         var_dump($view);
     }
 
-    echo 'error';
+    echo 'Error 404';
 }

@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace Http;
 
 
-
+/**
+ * сущность http-ответа
+ * Class Response
+ * @package Http
+ */
 class Response
 {
     /**
