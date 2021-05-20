@@ -26,7 +26,7 @@ $migration = new class
                         id          int auto_increment,
                         name        varchar(50)                         not null,
                         description text                                not null,
-                        created     timestamp default CURRENT_TIMESTAMP not null,
+                        created     timestamp default (current_timestamp()) not null,
                         constraint entities_id_uindex
                                     unique (id),
                         constraint entities_name_uindex
@@ -63,12 +63,22 @@ $migration = new class
 
     public function seed(int $count): void
     {
-        $faker = Factory::create();
-        $query = 'insert into' . $this->name . '(name,description,created) values(:name,:description,:created)';
+        $faker     = Factory::create('ru_RU');
+        $query     = 'insert into ' . $this->name . '(name,description,created) values(:name,:description,:created)';
+        $statement = $this->connection->prepare($query);
+
         for($i = 0; $i < $count; ++$i){
-            $this->connection->prepare();
+
+            $statement->bindParam('name',$faker->userName);
+            $statement->bindParam('description',$faker->realText(300));
+            $statement->bindParam('created',date('Y-m-d H:i:s', $faker->unixTime));
+            $statement->execute();
         }
     }
 };
 
-$migration->{$argv[1]}();
+
+/**
+ * Вызов методов объекта миграции из консоли
+ */
+$migration->{$argv[1]}(isset($argv[2]) ? intval($argv[2]) : null);

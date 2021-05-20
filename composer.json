@@ -20,6 +20,7 @@
             "App\\Middlewares\\": "App/Middlewares",
             "App\\Models\\": "App/Models",
             "App\\Core\\": "App/Core",
+            "App\\Services\\": "App/Services",
             "App\\Core\\Traits\\" : "App/Core/Traits",
             "App\\Core\\Exceptions\\": "App/Core/Exceptions",
             "Services\\" : "Services",

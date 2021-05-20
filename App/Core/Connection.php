@@ -27,7 +27,7 @@ class Connection
     {
           $confPdo = Config::database('mysql');
            try {
-               self::$pdo = new \PDO('mysql:host=' . $confPdo['host'] . ';' . $confPdo['dbname'] ,$confPdo['user'], $confPdo['password'], [\PDO::ATTR_EMULATE_PREPARES => true, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+               self::$pdo = new \PDO('mysql:host=' . $confPdo['host'] . ';' . 'dbname=' . $confPdo['dbname'] ,$confPdo['user'], $confPdo['password'], [\PDO::ATTR_EMULATE_PREPARES => true, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
                $this->dbName = $confPdo['dbname'];
            } catch (\PDOException $exception) {
                echo $exception->getMessage();

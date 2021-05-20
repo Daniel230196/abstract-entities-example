@@ -1,13 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Services;
+namespace App\Services;
 
 
 use App\Core\Exceptions\ServiceResolverException;
 use ReflectionClass;
 
-class ServiceFactory
+/**
+ * Class ServiceBuilder
+ * @package Services
+ */
+class ServiceBuilder
 {
 
     private static array $instances = [];
@@ -43,7 +47,7 @@ class ServiceFactory
     }
 
     /**
-     * Проверить наличие класса-сервиса в папке
+     * Проверить наличие сервиса
      * @param string $name
      * @return bool
      */
@@ -54,6 +58,7 @@ class ServiceFactory
     }
 
     /**
+     * Формирование объекта-сервиса
      * @param string $class
      * @return object
      * @throws \ReflectionException
@@ -75,6 +80,7 @@ class ServiceFactory
     }
 
     /**
+     * Вспомогательный метод для разрешения зависимостей
      * @param array $args
      * @param ReflectionClass $reflectionClass
      * @return object

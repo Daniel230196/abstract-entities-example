@@ -3,6 +3,8 @@
 
 namespace App\Controllers;
 
+use App\Services\ServiceBuilder;
+
 /**
  * Class EntityController
  * Контроллер сущностей
@@ -11,12 +13,17 @@ namespace App\Controllers;
 class EntityController extends BaseController
 {
 
+    protected array $middleware = [];
+
     /**
      * Дефолтный метод контроллера
      */
     public function default()
     {
-        echo 'default Method';
+        $entityServ = ServiceBuilder::getService('Entity');
+
+        $page = $this->request->get['page'];
+        $entityServ->byPage($page);
     }
 
     /**

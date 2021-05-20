@@ -17,7 +17,7 @@ use Http\Response;
 class Application
 {
     /**
-     * Метод, запускающий приложение
+     * Основной метод приложения
      */
     public static function start(): void
     {
