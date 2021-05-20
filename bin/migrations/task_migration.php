@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Config;
 use App\Core\Connection;
+use Faker\Factory;
 
 require_once 'vendor/autoload.php';
 
@@ -60,9 +61,13 @@ $migration = new class
         }
     }
 
-    public function seed(int $count)
+    public function seed(int $count): void
     {
-
+        $faker = Factory::create();
+        $query = 'insert into' . $this->name . '(name,description,created) values(:name,:description,:created)';
+        for($i = 0; $i < $count; ++$i){
+            $this->connection->prepare();
+        }
     }
 };
 

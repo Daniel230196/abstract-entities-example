@@ -25,7 +25,7 @@ abstract class BaseController implements ControllerInterface
     /**
      * @var Connection
      */
-    protected Connection $em;
+    protected Connection $connection;
 
     /**
      * @var Request
@@ -37,7 +37,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function __construct()
     {
-        $this->em = Connection::getInstance();
+        $this->connection = Connection::getInstance();
     }
 
     public function setRequest(Request $request)
