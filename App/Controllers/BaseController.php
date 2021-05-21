@@ -22,10 +22,6 @@ abstract class BaseController implements ControllerInterface
      */
     protected array $middleware;
 
-    /**
-     * @var Connection
-     */
-    protected Connection $connection;
 
     /**
      * @var Request
@@ -37,7 +33,6 @@ abstract class BaseController implements ControllerInterface
      */
     public function __construct()
     {
-        $this->connection = Connection::getInstance();
     }
 
     public function setRequest(Request $request)
@@ -60,7 +55,7 @@ abstract class BaseController implements ControllerInterface
      * @param string $name
      * @param array|null $viewData
      */
-    protected function view(string $name, ?array $viewData = [])
+    protected function view(string $name, ?array $viewData = []): void
     {
         view($name, $viewData);
     }

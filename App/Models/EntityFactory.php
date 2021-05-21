@@ -17,6 +17,12 @@ class EntityFactory
      */
     public static function fromArray(array $entityData): Entity
     {
-        return new Entity($entityData['id'],$entityData['created'],$entityData['name'],$entityData['description']);
+
+        return new Entity(
+            (int)$entityData['id'],
+            date_create_from_format('Y-m-d H:i:s',$entityData['created']),
+            $entityData['name'],
+            $entityData['description']
+        );
     }
 }

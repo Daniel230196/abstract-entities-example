@@ -4,7 +4,12 @@
 namespace App\Views;
 
 
-class CardView
+class CardView extends View
 {
 
+
+    public function renderTemplate()
+    {
+        // TODO: Implement renderTemplate() method.
+    }
 }

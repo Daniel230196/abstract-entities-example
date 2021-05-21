@@ -8,6 +8,7 @@ namespace App;
 use App\Controllers\ControllerInterface;
 use App\Controllers\EntityController;
 use App\Core\Exceptions\RouteException;
+use App\Middlewares\MiddlewareInterface;
 
 class Router
 {
@@ -53,7 +54,7 @@ class Router
     {
         $controller                     =  $this->controller($uri);
         $method                         = $this->method($uri, $this->routes[get_class($controller)]);
-        var_dump($method);
+
         $this->statement['controller']  = $controller;
         $this->statement['action']      = $method;
 
@@ -87,12 +88,15 @@ class Router
         }
 
         $middleware = $params['controller']->middleware();
+
         if (!empty($middleware)) {
             $result = [];
+
             foreach( $middleware as $key=>$state){
                 $methodControl = explode('|' , $key );
                 $class = array_keys($state)[0];
                 $middlewareParams = $state[$class];
+
                 if(in_array($params['action'], $methodControl, true) &&
                     (new \ReflectionClass($class))->implementsInterface(MiddlewareInterface::class))
                 {

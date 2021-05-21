@@ -13,7 +13,7 @@ abstract class View
     /**
      * @const TEMP_PATH путь до папки с шаблонами
      */
-    protected const TEMP_PATH = ROOT_DIR . 'App/templates/';
+    protected const TEMP_PATH = ROOT_DIR . '/App/templates/';
 
     /**
      * @const LAYOUT
@@ -38,6 +38,11 @@ abstract class View
     public static function content(View $context): void
     {
         $context->renderTemplate();
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
     }
 
     /**

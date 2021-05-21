@@ -8,10 +8,6 @@
     <title>Layout</title>
 </head>
 <body class="container">
-<form method="get" enctype="multipart/form-data" action="<?php DEV_HOST ?>">
-    <input type="text">
-    <input type="submit">
-</form>
 <?php \App\Views\View::content($this); ?>
 </body>
 

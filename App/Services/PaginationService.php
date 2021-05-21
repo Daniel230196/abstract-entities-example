@@ -22,21 +22,26 @@ class PaginationService
         $this->limit = $limit;
     }
 
-    public function countRows(): int
+
+    public function getForPage($table, $page, $perPage = 20)
     {
 
     }
 
-    public function getForPage($table, $page,$perPage = 20)
-    {
-
-    }
-
+    /**
+     * Расчет офсета для запроса на основании номера страницы
+     * @param int $page
+     * @return float|int
+     */
     public function calcOffset(int $page)
     {
-        return ($page - 1) * $this->limit;
+        $offset = ($page - 1) * $this->limit;
+        return $offset === 0 ? 1 : $offset;
     }
 
+    /**
+     * Общее кол-во страниц, на основании кол-ва строк в таблице и текущего лимита
+     */
     public function countPages(int $total)
     {
         return ceil($total / $this->limit);

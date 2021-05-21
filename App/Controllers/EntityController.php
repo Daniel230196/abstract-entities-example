@@ -3,6 +3,7 @@
 
 namespace App\Controllers;
 
+use App\Middlewares\ValidationMiddleware;
 use App\Services\ServiceBuilder;
 
 /**
@@ -13,17 +14,23 @@ use App\Services\ServiceBuilder;
 class EntityController extends BaseController
 {
 
-    protected array $middleware = [];
+    protected array $middleware = [
+
+    ];
 
     /**
      * Дефолтный метод контроллера
      */
     public function default()
     {
-        $entityServ = ServiceBuilder::getService('Entity');
+        $page       = (int)$this->request->get['page'];
+        $limit      = (int)$this->request->get['limit'];
 
-        $page = $this->request->get['page'];
-        $entityServ->byPage($page);
+        $entityServ = ServiceBuilder::getService('Entity');
+        $data       = $entityServ->byPage($limit,$page);
+
+        $this->view('main', $data);
+
     }
 
     /**

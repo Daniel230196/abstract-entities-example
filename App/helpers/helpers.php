@@ -16,8 +16,7 @@ function template(string $name, array $params = [])
 }
 
 /**
- * @param string $className
- *
+ * @param string $name
  * @param array|null $data
  */
 function view(string $name, ?array $data = [])
@@ -26,9 +25,10 @@ function view(string $name, ?array $data = [])
     $viewPath = VIEW_PATH;
     $className = VIEW_NAMESPACE . ucfirst(strtolower($name)) . 'View';
 
-    if (class_exists($className)){
-        $view = new $className($data);
+    if (!class_exists($className)){
+        echo 'Error 404';
     }
 
-    echo 'Error 404';
+    $view = new $className($data);
+
 }
