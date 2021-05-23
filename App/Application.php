@@ -23,7 +23,7 @@ class Application
     {
         Config::init();
 
-        $request = new Request();
+        $request = Request::fromGlobals();
         $kernel = new Kernel();
         $kernel->route($request)
             ->thruPipeline($request)

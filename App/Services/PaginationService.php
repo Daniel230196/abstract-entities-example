@@ -9,7 +9,7 @@ namespace App\Services;
  * Класс для постраничной пагинации сущностей
  * @package Services
  */
-class PaginationService
+class PaginationService implements ServiceInterface
 {
     private int $limit;
 
@@ -23,11 +23,6 @@ class PaginationService
     }
 
 
-    public function getForPage($table, $page, $perPage = 20)
-    {
-
-    }
-
     /**
      * Расчет офсета для запроса на основании номера страницы
      * @param int $page
@@ -35,12 +30,13 @@ class PaginationService
      */
     public function calcOffset(int $page)
     {
-        $offset = ($page - 1) * $this->limit;
-        return $offset === 0 ? 1 : $offset;
+        return ($page - 1) * $this->limit;
     }
 
     /**
      * Общее кол-во страниц, на основании кол-ва строк в таблице и текущего лимита
+     * @param int $total
+     * @return false|float
      */
     public function countPages(int $total)
     {

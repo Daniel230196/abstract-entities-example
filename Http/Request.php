@@ -53,13 +53,13 @@ class Request
      */
     private \SessionHandlerInterface $session;
 
-    public function __construct()
+    public function __construct(array $get = [], array $post = [], array $headers = [], string $method = 'GET', string $uri = '/')
     {
-        $this->get = $this->clear($_GET);
-        $this->post = $this->clear($_POST);
-        $this->headers = getallheaders();
-        $this->method = $_SERVER['REQUEST_METHOD'];
-        $this->uri = $_SERVER['REQUEST_URI'];
+        $this->get = $this->clear($get);
+        $this->post = $this->clear($post);
+        $this->headers = $headers;
+        $this->method = $method;
+        $this->uri = $uri;
         $this->client = $_SERVER['REMOTE_ADDR'] ?? null;
     }
 
@@ -77,12 +77,21 @@ class Request
     }
 
     /**
+     * Создать запрос из глобальных переменных
+     * @return Request
+     */
+    public static function fromGlobals(): Request
+    {
+        return new Request($_GET, $_POST, getallheaders(), $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+    }
+
+    /**
      * Проверка ajax-запроса
      * @return bool
      */
     public function isAjax(): bool
     {
-        return !empty($this->headers()['HTTP_X_REQUESTED_WITH']);
+        return (!empty($this->headers()['X-Requested-With']));
     }
 
     /**

@@ -27,7 +27,7 @@ class Router
       EntityController::class => [
           'create',
           'find',
-          'method'
+          'delete'
       ]
     ];
 
@@ -93,17 +93,14 @@ class Router
             $result = [];
 
             foreach( $middleware as $key=>$state){
-                $methodControl = explode('|' , $key );
+                $methodControl = preg_match('/\|/', $key) ? explode('|' , $key ) : [$key];
                 $class = array_keys($state)[0];
-                $middlewareParams = $state[$class];
-
+                $middlewareParams = $state[$class] ?? [];
                 if(in_array($params['action'], $methodControl, true) &&
                     (new \ReflectionClass($class))->implementsInterface(MiddlewareInterface::class))
                 {
-
                     $class::addParams($middlewareParams);
                     $result[] = $class;
-
                 }else{
                     continue;
                 }

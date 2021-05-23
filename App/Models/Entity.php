@@ -9,10 +9,10 @@ namespace App\Models;
  */
 class Entity
 {
-    private ?int $id;
-    private string $name;
-    private string $description;
-    private ?\DateTime $created;
+    public ?int $id;
+    public string $name;
+    public string $description;
+    public ?\DateTime $created;
 
     public function __construct(?int $id, ?\DateTime $created, string $name = '', string $description = '')
     {

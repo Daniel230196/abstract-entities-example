@@ -37,7 +37,7 @@ class Response
      */
     private array $headers;
 
-    public function __construct(array $headers ,int $statusCode,array $contentAction ,?string $content="")
+    public function __construct(array $headers, int $statusCode, array $contentAction, ?string $content = "")
     {
         $this->content = $content;
         $this->statusCode = $statusCode;
@@ -45,6 +45,40 @@ class Response
         $this->headers = $headers;
     }
 
+    /**
+     * Добавить заголовок ответа
+     * @param string $header
+     */
+    public function setHeader(string $header)
+    {
+        $this->headers[] = $header;
+    }
+
+    /**
+     * Установить статус ответа
+     * @param int $statusCode
+     */
+    public function setStatus(int $statusCode): void
+    {
+        $this->statusCode = $statusCode;
+    }
+
+    /**
+     * Установить тело ответа
+     * @param string $content
+     */
+    public function setContent(string $content)
+    {
+        $this->content = $content;
+    }
+
+    /**
+     * @param string $text
+     */
+    public function setStatusText(string $text): void
+    {
+        $this->statusText = $text;
+    }
 
     /**
      * Разрешение ответа. Заголовки + контент
@@ -52,8 +86,12 @@ class Response
      */
     public function resolve(): void
     {
+
+        if(empty($this->content)){
+            $this->resolveAction();
+        }
+
         $this->sendHeaders();
-        $this->resolveAction();
         $this->sendContent();
     }
 
@@ -72,13 +110,16 @@ class Response
      */
     private function sendHeaders(): void
     {
+        if($this->statusCode!==200){
+            header('HTTP/1.1 ' . $this->statusCode . ' ' .  $this->statusText);
+        }
         foreach ($this->headers as $header){
             header($header);
         }
     }
 
     /**
-     *
+     * Вывести содержимое в браузер
      */
     private function sendContent(): void
     {

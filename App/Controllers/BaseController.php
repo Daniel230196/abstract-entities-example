@@ -7,6 +7,8 @@ namespace App\Controllers;
 require_once 'App/helpers/helpers.php';
 
 use App\Core\Connection;
+use App\Services\ServiceBuilder;
+use App\Services\ServiceInterface;
 use Http\Request;
 use function App\helpers\view;
 
@@ -22,6 +24,7 @@ abstract class BaseController implements ControllerInterface
      */
     protected array $middleware;
 
+    protected static ServiceInterface $service;
 
     /**
      * @var Request
@@ -30,9 +33,11 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * BaseController constructor.
+     * @param string|null $serviceName
      */
-    public function __construct()
+    public function __construct(?string $serviceName)
     {
+        static::$service = ServiceBuilder::getService($serviceName);
     }
 
     public function setRequest(Request $request)

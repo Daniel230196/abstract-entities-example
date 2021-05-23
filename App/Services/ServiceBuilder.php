@@ -60,12 +60,17 @@ class ServiceBuilder
     /**
      * Формирование объекта-сервиса
      * @param string $class
-     * @return object
+     * @return ServiceInterface
+     * @throws ServiceResolverException
      * @throws \ReflectionException
      */
-    private function resolve(string $class): object
+    private function resolve(string $class): ServiceInterface
     {
         $reflection = new ReflectionClass($class);
+        if($reflection->getInterfaceNames()[0] !==  __NAMESPACE__.'\ServiceInterface') {
+            throw new ServiceResolverException('Service cant be resolved - Service interface not implemented');
+        }
+
         $constructor = $reflection->getConstructor();
 
         if ($constructor !== null) {
@@ -84,9 +89,9 @@ class ServiceBuilder
      * @param array $args
      * @param ReflectionClass $reflectionClass
      * @return object
-     * @throws \ReflectionException
+     * @throws \ReflectionException|ServiceResolverException
      */
-    private function resolveDependencies(array $args, ReflectionClass $reflectionClass): object
+    private function resolveDependencies(array $args, ReflectionClass $reflectionClass): ServiceInterface
     {
 
         foreach($args as &$arg){

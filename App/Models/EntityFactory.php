@@ -19,10 +19,10 @@ class EntityFactory
     {
 
         return new Entity(
-            (int)$entityData['id'],
-            date_create_from_format('Y-m-d H:i:s',$entityData['created']),
-            $entityData['name'],
-            $entityData['description']
+            $entityData['id'] ?? null,
+            date_create_from_format('Y-m-d H:i:s',$entityData['created'] ?? date('Y-m-d H:i:s', time())),
+            $entityData['name'] ?? '',
+            $entityData['description'] ?? ''
         );
     }
 }

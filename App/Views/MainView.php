@@ -6,15 +6,16 @@ namespace App\Views;
 
 class MainView extends View
 {
-    private $pages;
-    private $limit = 20;
+    private int $pages;
+    private int $limit;
     private CardView $card;
 
     public function __construct(array $viewData = [])
     {
 
-        if(isset($viewData['countPages'])){
+        if(isset($viewData['countPages']) && isset($viewData['pageLimit'])){
 
+            $this->limit = (int)(array_pop($viewData));
             $this->pages = (int)(array_pop($viewData));
 
         }

@@ -49,8 +49,6 @@ class Kernel
 
     public function handle(Request $request): Kernel
     {
-        //TODO: реализовать резрешение routeAction в response , добавить проверку запроса на наличие специфических заголовков, обработать нужным образом, сформировать ответ
-        //TODD: добавить хендлер
 
         return $this;
     }
