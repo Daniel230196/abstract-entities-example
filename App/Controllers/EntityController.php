@@ -23,11 +23,13 @@ class EntityController extends BaseController
     protected static ServiceInterface $service;
 
     protected array $middleware = [
-        'delete' => [
-            OnlyAjaxMiddleware::class => []
+        'create' => [
+            OnlyAjaxMiddleware::class =>[],
+            ValidateMiddleware::class => ['name' => '/\'\";\(\)|\'\"|\"|\'|;/', 'description' => '/\'\";\(\)|\'\"|\"|\'|;/']
         ],
-        'delete|create' => [
-            ValidateMiddleware::class => ['name' => '/[a-zа-я\d]/i', 'description' => '/[a-zа-я\d]i\x/']
+        'delete' => [
+            OnlyAjaxMiddleware::class =>[],
+            ValidateMiddleware::class => ['id' => '/\d/']
         ]
     ];
 
@@ -39,7 +41,7 @@ class EntityController extends BaseController
     /**
      * Дефолтный метод контроллера
      */
-    public function default()
+    public function default(): void
     {
         $page = $this->request->get['page'] ?? self::PAGE;
         $limit = $this->request->get['limit'] ?? self:: LIMIT;
@@ -53,35 +55,32 @@ class EntityController extends BaseController
     /**
      * Метод создания сущности
      */
-    public function create()
+    public function create(): string
     {
         $data = $this->request->post;
-        foreach ($data as &$field) {
-            $field = $this->decodeFormData($field);
-        }
 
-       static::$service->create($data);
+        static::$service->create($data);
+        return 'Сущность добавлена';
     }
 
     /**
      * Метод
      */
-    public function read()
+    public function find()
     {
-        echo 'find method';
+
     }
 
     /**
      * Удалить сущность
+     * @return string
      */
-    public function delete(): void
+    public function delete(): string
     {
-        $data = $this->decodeFormData($this->request->post['id']);
+        $data = $this->request->post;
         static::$service->delete($data['id']);
+        return 'Сущность удалена';
     }
 
-    private function decodeFormData(string $data)
-    {
-        return json_decode(html_entity_decode(trim($data, '\"\'')), true);
-    }
+
 }

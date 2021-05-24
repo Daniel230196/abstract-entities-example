@@ -44,8 +44,11 @@ class EntityService implements ServiceInterface
     }
 
 
-    public function findBy()
+    public function findBy(string $text): array
     {
+        $stmt = $this->connection->prepare("select * from {$this->tableName} where match (title, body) against(:text)");
+
+
 
     }
 

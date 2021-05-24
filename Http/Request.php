@@ -91,7 +91,7 @@ class Request
      */
     public function isAjax(): bool
     {
-        return (!empty($this->headers()['X-Requested-With']));
+        return (!empty($this->headers()['X-Requested-with']));
     }
 
     /**
@@ -102,6 +102,25 @@ class Request
     {
         return $this->$name ?? null;
     }
+
+    /**
+     * @param string $name
+     * @param $value
+     */
+    public function __set(string $name, $value)
+    {
+        $this->$name = $value;
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($this->$name);
+    }
+
 
     /**
      * Получить метод контроллера из строки запроса
