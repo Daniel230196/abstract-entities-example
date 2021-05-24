@@ -44,12 +44,26 @@ class EntityService implements ServiceInterface
     }
 
 
-    public function findBy(string $text): array
+    /**
+     * Поиск позиций по тексту
+     * @param array $text
+     * @return array
+     */
+    public function findByText(array $text): array
     {
-        $stmt = $this->connection->prepare("select * from {$this->tableName} where match (title, body) against(:text)");
+        $stmt = $this->connection->prepare("select * from {$this->tableName} where description like ?");
 
-
-
+        $res = [];
+        foreach ($text as $item){
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $stmt->execute(['%'.$item.'%']);
+            $res += $this->createEntitiesStmt($stmt->fetchAll());
+            $stmt->execute(['%'.$item]);
+            $res += $this->createEntitiesStmt($stmt->fetchAll());
+            $stmt->execute([$item.'%']);
+            $res += $this->createEntitiesStmt($stmt->fetchAll());
+        }
+        return $res;
     }
 
     /**
@@ -105,4 +119,17 @@ class EntityService implements ServiceInterface
         }
     }
 
+    /**
+     * Создать массив сущностей
+     * @param array $data
+     * @return array
+     */
+    private function createEntitiesStmt(array $data): array
+    {
+        $result = [];
+        foreach ($data as $item) {
+            $result[] = EntityFactory::fromStatement($item);
+        }
+        return $result;
+    }
 }

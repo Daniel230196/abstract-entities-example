@@ -45,9 +45,17 @@ abstract class BaseController implements ControllerInterface
         $this->request = $request;
     }
 
-    public function middleware(): array
+    public function middleware(string $method): array
     {
-        return $this->middleware;
+
+        $pattern = "/{$method}/";
+        $result = [];
+        foreach ($this->middleware as $methods=>$state){
+            if(preg_match($pattern, $methods) || $methods === 'all'){
+                $result[$methods] = $state;
+            }
+        }
+        return $result;
     }
 
     /**

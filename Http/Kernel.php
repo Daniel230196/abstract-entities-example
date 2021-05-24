@@ -102,13 +102,13 @@ class Kernel
 
         if(!empty($middlewares[0])){
             foreach ($middlewares as $key=>&$middleware){
-                $next = $this->middleware[$key + 1] ?? null;
+                $nextKey = $key + 1;
+                $next = $middlewares[$nextKey] ?? null;
                 $middleware = $next ? new $middleware(new $next()) : new $middleware(null);
             }
 
             $middlewares[0]($request, $response);
         }
-
 
         return $this;
     }

@@ -91,7 +91,7 @@ class Request
      */
     public function isAjax(): bool
     {
-        return (!empty($this->headers()['X-Requested-with']));
+        return (!empty($this->headers()['X-Requested-With']));
     }
 
     /**

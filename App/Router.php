@@ -87,23 +87,23 @@ class Router
             throw new RouteException('invalid middleware params', 400);
         }
 
-        $middleware = $params['controller']->middleware();
+        $middleware = $params['controller']->middleware($params['action']);
 
         if (!empty($middleware)) {
             $result = [];
 
-            foreach( $middleware as $key=>$state){
-                $methodControl = preg_match('/\|/', $key) ? explode('|' , $key ) : [$key];
-                $class = array_keys($state)[0];
-                $middlewareParams = $state[$class] ?? [];
-                if(in_array($params['action'], $methodControl, true) &&
-                    (new \ReflectionClass($class))->implementsInterface(MiddlewareInterface::class))
-                {
-                    $class::addParams($middlewareParams);
-                    $result[] = $class;
-                }else{
-                    continue;
+            foreach( array_values($middleware) as $state){
+                foreach ($state as $key=>$value){
+                    $middlewareParams = $value;
+                    $class = $key;
+                    if((new \ReflectionClass($class))->implementsInterface(MiddlewareInterface::class)){
+                        $class::addParams($middlewareParams);
+                        $result[] = $class;
+                    }else{
+                        continue;
+                    }
                 }
+
             }
             return $result;
         }

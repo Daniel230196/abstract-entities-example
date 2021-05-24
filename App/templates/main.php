@@ -1,7 +1,7 @@
 <div class="formContainer">
     <form method="get" enctype="multipart/form-data" action="<?php echo DEV_HOST ?>">
         <input id="find" type="text">
-        <input type="submit" class="b-std" value="Найти">
+        <input id="find-btn" type="submit" class="b-std" value="Найти">
     </form>
     <div class="addWrapper">
     <button class="addEntity b-std">Добавить позицию</button>
@@ -13,6 +13,7 @@
 <?php endfor;?>
 </div>
 <?php $i = 1; foreach ($this->data as $datum): ?>
+<div class="card-container">
 <div class="cards-wrapper">
     <div class="entityCard<?php echo $datum->id ?> card-main">
     <hr>
@@ -24,3 +25,5 @@
 </div>
 <?php endforeach;?>
 </div>
+</div>
+

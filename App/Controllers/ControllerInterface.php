@@ -15,9 +15,11 @@ interface ControllerInterface
 {
     /**
      * Возвращает массив с промежуточными обработчиками запроса
+     * для метода
+     * @param string $method
      * @return array
      */
-    public function middleware(): array ;
+    public function middleware(string $method): array ;
 
     /**
      * Дефолтный метод контроллера

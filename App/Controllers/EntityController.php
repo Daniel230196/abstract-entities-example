@@ -30,6 +30,10 @@ class EntityController extends BaseController
         'delete' => [
             OnlyAjaxMiddleware::class =>[],
             ValidateMiddleware::class => ['id' => '/\d/']
+        ],
+        'find' => [
+            OnlyAjaxMiddleware::class =>[],
+            ValidateMiddleware::class => ['all' => '/\'\";\(\)|\'\"|\"|\'|;/']
         ]
     ];
 
@@ -58,7 +62,6 @@ class EntityController extends BaseController
     public function create(): string
     {
         $data = $this->request->post;
-
         static::$service->create($data);
         return 'Сущность добавлена';
     }
@@ -68,7 +71,12 @@ class EntityController extends BaseController
      */
     public function find()
     {
+        $text = explode(' ', $this->request->post['text']);
+        $text = array_filter($text, function ($el){
+            return !empty($el);
+        });
 
+        var_dump(static::$service->findByText($text));
     }
 
     /**

@@ -38,22 +38,6 @@ class OnlyAjaxMiddleware extends Middleware
         $this->then($request,$response);
     }
 
-    /**
-     * Декодирование моссива запроса
-     * @param Request $request
-     * @param string $method
-     */
-    private function decodeJson(Request $request, string $method): void
-    {/*
-        var_dump($request->post);
-        foreach ($request->{$method} as $key=>$data){
-            //var_dump(json_decode(json_encode($data), true));
-            var_dump($data);
-            $request->{$method}[$key] = json_decode(html_entity_decode(trim($data, '\"\'')), true);
-            var_dump($request->{$method}[$key]);
-        }
-        var_dump($request->{$method});*/
-    }
 
     /**
      * @param Request $request

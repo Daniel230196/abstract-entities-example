@@ -7,7 +7,7 @@
 return [
     'mysql' => [
         'driver' => 'pdo_mysql',
-        'dbname' => 'test',
+        'dbname' => 'task',
         'user' => 'root',
         'password' => 'eyf89cp8',
         'host' => 'localhost',

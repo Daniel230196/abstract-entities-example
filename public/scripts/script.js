@@ -16,6 +16,7 @@ const APP =  {
 
     },
 
+
     modal: function(){
         const $modal =  createModal();
         const ANIM_SPEED = 200;
@@ -128,7 +129,7 @@ const APP =  {
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-with': 'XMLHttpRequest',
+                'X-Requested-With': 'XMLHttpRequest',
             }
         })
         if(!response.ok){
@@ -143,60 +144,59 @@ const APP =  {
         return $spinner;
     },
 
-    findEntitiesByText: async function(text){
+    findMode: function(){
+        let findMode = false;
+        const content = document.querySelector('.card-container');
+        const spinner = APP.spinner();
+        return {
+            start(){
+                if(!findMode){
+                    let cards = document.querySelector('.cards-wrapper');
+                    cards.parentNode.removeChild(cards);
+                }
+                let data = document.querySelector('#find').value;
+                this.send(data).then(
+                    resolve =>{
+                        content.removeChild(spinner);
+                        console.log(resolve)
 
-        if(!text.match(/[a-zа-я0-9\s]+/i)){
-            throw 'Недопустимые символы в запросе!';
-        }else if(!text){
-            throw 'Пустой запрос';
-        }
+                    },
+                    reject=>{
+                        console.log(JSON.parse(reject))
+                    }
+                )
+            },
 
-        let url = this.host + '/entity/find';
-        let formData = new FormData();
-        formData.append('text', text);
+            async send(data){
+                findMode = true;
+                if(!data.match(/[a-zа-я0-9\s]+/i)){
+                    throw 'Недопустимые символы в запросе!';
+                }else if(!data){
+                    throw 'Пустой запрос';
+                }
 
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers:{
-                'X-Requested-with': 'XMLHttpRequest'
+                content.append(spinner);
+                let formData = new FormData();
+                formData.append('text', JSON.stringify(data));
+                const response = await fetch(APP.host + '/entity/find', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-with': 'XMLHttpRequest'
+                    }
+                })
+                return response.json();
             }
-        })
-
-        return response.text();
-    }
-}
-
-let searchButton = document.querySelector('.b-std');
-searchButton.addEventListener('click', (e)=>{
-    const spinner = APP.spinner();
-    e.preventDefault();
-    let cards = document.querySelector('.cards-wrapper');
-    cards.parentNode.append(spinner);
-    cards.parentNode.removeChild(cards);
-    let text = document.getElementById('find').value;
-
-    APP.findEntitiesByText(text).then(
-        resolve => {
-            document.body.removeChild(spinner);
-            document.body.insertAdjacentHTML("beforeend", resolve);
-        },
-        reject =>{
-            document.body.removeChild(spinner)
-            document.body.insertAdjacentHTML('beforeend', `
-            <div style="font-size: large" class="error">
-                ${reject}
-            </div>
-            `);
-            setTimeout(function(){
-                window.location.href = this.host + '/';
-            }, 2000);
         }
-    )
+    }
 
+}
+const findMode = APP.findMode();
+let findBtn = document.getElementById('find-btn');
+findBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    findMode.start();
 })
-
-
 
 let deleteButtons = document.querySelectorAll('.deleteButton');
 
