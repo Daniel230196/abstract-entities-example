@@ -9,6 +9,7 @@ use ReflectionClass;
 
 /**
  * Class ServiceBuilder
+ * Строитель сервисов
  * @package Services
  */
 class ServiceBuilder

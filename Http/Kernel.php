@@ -47,11 +47,6 @@ class Kernel
     {
     }
 
-    public function handle(Request $request): Kernel
-    {
-
-        return $this;
-    }
 
     /**
      * Маршрутизация запроса , с сохранением параметров для дальнейшей обработки
@@ -60,7 +55,7 @@ class Kernel
      */
     public function route(Request $request): Kernel
     {
-        $router = new Router($request->uri);
+        $router = new Router();
 
         try{
             $this->routeMiddleware = $router->start($request->uri);
@@ -70,11 +65,9 @@ class Kernel
         }catch(\ReflectionException $e){
             echo $e->getMessage();
             exit();
-            //TODO: Handle exception
         }catch (RouteException $routeEx){
             echo $routeEx->getMessage();
             exit();
-            //TODO: Handle exception
         }
 
         return $this;
@@ -114,19 +107,11 @@ class Kernel
     }
 
     /**
-     *
+     * Разрешение ответа
      */
     public function terminate(): void
     {
         $this->response->resolve();
     }
 
-    /**
-     * Передать
-     * @return array
-     */
-    private function resolveAction(): array
-    {
-        return $this->routeAction;
-    }
 }

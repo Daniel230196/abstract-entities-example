@@ -1,12 +1,10 @@
 <?php
-
+declare(strict_types=1);
 
 namespace App\Controllers;
 
 use App\Middlewares\OnlyAjaxMiddleware;
 use App\Middlewares\ValidateMiddleware;
-use App\Services\EntityService;
-use App\Services\ServiceBuilder;
 use App\Services\ServiceInterface;
 
 /**

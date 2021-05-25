@@ -1,12 +1,10 @@
 <?php
-
 declare(strict_types = 1);
 
 namespace App\Controllers;
 
 require_once 'App/helpers/helpers.php';
 
-use App\Core\Connection;
 use App\Services\ServiceBuilder;
 use App\Services\ServiceInterface;
 use Http\Request;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 /**
+ * Класс сущности
  * Class Entity
  * @package App\Models
  */
@@ -13,6 +14,7 @@ class Entity
     public string $name;
     public string $description;
     public ?\DateTime $created;
+    private static string $tableName = 'entities';
 
     public function __construct(?int $id, ?\DateTime $created, string $name = '', string $description = '')
     {
@@ -32,4 +34,8 @@ class Entity
         $this->$name = $value;
     }
 
+    public static function getTableName(): string
+    {
+        return self::$tableName;
+    }
 }

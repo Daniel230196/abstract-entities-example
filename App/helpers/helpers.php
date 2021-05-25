@@ -5,30 +5,19 @@ declare(strict_types=1);
 namespace App\helpers;
 
 
-
-function template(string $name, array $params = [])
-{
-    $viewFiles = scandir('../templates');
-    $name = $name . '.php';
-    extract($params);
-    include $name;
-
-}
-
 /**
+ * Создать объект представления
  * @param string $name
  * @param array|null $data
  */
 function view(string $name, ?array $data = [])
 {
-    $viewNamespace = VIEW_NAMESPACE;
-    $viewPath = VIEW_PATH;
     $className = VIEW_NAMESPACE . ucfirst(strtolower($name)) . 'View';
 
     if (!class_exists($className)){
         echo 'Error 404';
     }
 
-    $view = new $className($data);
+    new $className($data);
 
 }

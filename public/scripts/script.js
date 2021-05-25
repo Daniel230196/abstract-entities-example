@@ -4,17 +4,6 @@ const APP =  {
 
     host: 'http://' + window.location.host,
 
-    constant: function(){
-        let url = this.host + '/public/constants.json'
-
-        return fetch(url)
-            .then((response) =>{
-                response.json().then((data)=>{
-                    console.log(data);
-                })
-            })
-    },
-
     init(){
 
         let deleteButtons = document.querySelectorAll('.deleteButton');
@@ -24,14 +13,13 @@ const APP =  {
                 let id = e.target.id;
                 let card = document.querySelectorAll('.entityCard'+id)[0];
                 card.innerHTML = '<hr>';
-                let spinner = APP.spinner();
-                card.append(spinner);
+                APP.addSpinner(card);
 
                 APP.deleteEntity(id).then(
 
                     resolve =>{
                         setTimeout(() =>{
-                            card.removeChild(spinner);
+                            APP.removeSpinner(card);
                             card.innerHTML = '<hr>';
                             card.innerHTML += resolve;
                         }, 500);
@@ -39,7 +27,7 @@ const APP =  {
                     },
                     reject =>{
                         setTimeout(() =>{
-                            card.removeChild(spinner);
+                            APP.removeSpinner(card);
                             card.innerHTML = '<hr>';
                             card.innerHTML += reject;
                         }, 500);
@@ -54,7 +42,8 @@ const APP =  {
         const ANIM_SPEED = 200;
         let closing = false;
         let destroyed = false;
-        const spinner = APP.spinner();
+        let modalBody = $modal.querySelector('.modal-content');
+
         const modal = {
             open() {
                 if (!closing) {
@@ -80,13 +69,13 @@ const APP =  {
             },
 
             async send(){
-                let modalBody = $modal.querySelector('.modal-content');
-                modalBody.appendChild(APP.spinner());
+
+                APP.addSpinner(modalBody);
 
                 let name = $modal.querySelector('input').value;
                 let descr = $modal.querySelector('textarea').value;
 
-                if(!name.match(/[a-zа-я0-9_]+/i) ){
+                if(!name.match(/[a-zа-я0-9_]+/i)){
                     throw 'Недопустимое название позиции';
                 }else if(!descr.match(/[a-zа-я0-9]+/i)){
                     throw 'Использованы недопустимые символы в описании';
@@ -122,9 +111,8 @@ const APP =  {
                         let message = document.createElement('span')
                         message.innerHTML = '&#10003;' + resolve;
                         message.classList.add('success');
-                        console.log(spinner);
-                        spinner.parentNode.append(message);
-                        spinner.parentNode.removeChild(spinner);
+                        APP.removeSpinner(modalBody);
+                        modalBody.appendChild(message);
                     }, 500);
 
                 },
@@ -133,23 +121,20 @@ const APP =  {
                         let message = document.createElement('span');
                         message.innerHTML = '&#10060;  ' + reject;
                         message.classList.add('error');
-                        spinner.parentNode.append(message);
-                        spinner.parentNode.removeChild(spinner);
+                        APP.removeSpinner(modalBody);
+                        modalBody.appendChild(message);
                     }, 500);
                 }
                 );
             }
         }
 
-
         $modal.addEventListener('click', modalClickHandler);
-
         return modal;
     },
 
     deleteEntity: async function (id = {}){
         let url = this.host + '/entity/delete';
-
         let formData = new FormData();
         formData.append('id', JSON.stringify(id))
         const response = await fetch(url, {
@@ -165,52 +150,64 @@ const APP =  {
         return response.text();
 
     },
-    spinner: function(){
+    addSpinner(node){
         let $spinner = document.createElement('div');
         $spinner.classList.add('spinner');
-        return $spinner;
+        node.appendChild($spinner);
+    },
+
+    removeSpinner(node){
+        let $spinner = document.querySelector('.spinner');
+        node.removeChild($spinner);
     },
 
     findMode: function(){
-        let findMode = false;
-        const content = document.querySelector('.card-container');
-        const spinner = APP.spinner();
+
+        let cleared = false;
+        const layout = document.querySelector('.card-container');
 
         return {
             start(){
-                if(!findMode){
+                if(!cleared){
                     let cards = this.getCards();
                     cards.parentNode.removeChild(cards);
+                    cleared = true;
                 }
-                let data = document.querySelector('#find').value;
-                this.send(data).then(
-                    resolve =>{
-                        setTimeout(()=>{
-                            content.removeChild(spinner);
-                        }, 200)
-                        this.render(resolve);
+
+                let text = document.getElementById('find').value;
+                let cards = document.createElement('div');
+                cards.classList.add('cards-wrapper');
+
+                layout.append(cards);
+                cleared = false;
+                APP.addSpinner(cards);
+                this.send(text).then(
+                    resolve=>{
+                        setTimeout(function(){
+                            APP.removeSpinner(cards);
+                        },500);
+                        this.render(resolve, cards);
                     },
                     reject=>{
-                        setTimeout(()=>{
-                            content.removeChild(spinner);
-                        }, 200)
-                        this.render(JSON.stringify([reject]));
+                        setTimeout(function(){
+                            APP.removeSpinner(cards);
+                        },500);
+                        this.renderError(reject, cards);
                     }
                 )
             },
 
             async send(data){
-                findMode = true;
                 if(!data){
-                    throw 'Пустой запрос!';
+                    throw 'Пустой запрос';
                 }else if(!data.match(/[a-zа-я0-9\s]+/i) || data.match(/[';":]/)){
-                    throw 'Недопустимые символы в запросе';
+                    throw 'Недопустимые символы в запросе'
                 }
 
-                content.append(spinner);
                 let formData = new FormData();
                 formData.append('text', JSON.stringify(data));
-                const response = await fetch(APP.host + '/entity/find', {
+
+                let response = await fetch(APP.host + '/entities/find', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -221,15 +218,11 @@ const APP =  {
                 return response.text();
             },
 
-            render(entityData){
+            render(entityData, node){
                 entityData = JSON.parse(entityData);
-                let layout = document.createElement('div');
-                layout.classList.add('cards-wrapper');
-                content.appendChild(layout);
-
-                entityData.forEach(entity=>{
-
-                    let html = `
+                if(entityData.length !== 0){
+                    entityData.forEach(entity=>{
+                        let html = `
                                 <div class="${'entityCard' + entity.id + ' card-main'}">
                                 <hr>
                                 <p class="name"> ${entity.name} </p>
@@ -237,13 +230,19 @@ const APP =  {
                                 <p> ${entity.description}</p>
                                 <button id="${entity.id}" class="b-close deleteButton">Удалить</button>
                             `;
-                    layout.insertAdjacentHTML('afterbegin',html);
-                });
+                        node.insertAdjacentHTML('afterbegin',html);
+                    });
+                }else{
+                    node.insertAdjacentHTML('afterbegin','<p class="success">Ничего не найдено</p>');
+                }
+
                 APP.init();
-                findMode = false;
 
             },
-
+            renderError(error, node){
+              let message = JSON.stringify(error);
+              node.insertAdjacentHTML('afterbegin', `<p class="error">${message}</p>`)
+            },
             getCards(){
                 return document.querySelector('.cards-wrapper');
             }

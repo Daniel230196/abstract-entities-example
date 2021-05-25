@@ -8,6 +8,10 @@ use App\Core\Exceptions\ValidationException;
 use Http\Request;
 use Http\Response;
 
+/**
+ * Class ValidateMiddleware
+ * @package App\Middlewares
+ */
 class ValidateMiddleware extends Middleware
 {
     /**
@@ -18,7 +22,6 @@ class ValidateMiddleware extends Middleware
 
     public function __invoke(Request $request, Response $response)
     {
-
         foreach (static::$params as $key => $rule) {
             switch ($request->method) {
                 case 'GET':
@@ -28,13 +31,18 @@ class ValidateMiddleware extends Middleware
                     $data = $request->post;
                     break;
             }
-
-            if ($key === 'all') {
-                $this->validateAll($rule, $data, $response);
-            } else {
-                $this->validateRequired($key, $data, $response);
-                $this->validatePattern($rule, $data[$key], $key, $response);
+            try{
+                if ($key === 'all') {
+                    $this->validateAll($rule, $data, $response);
+                } else {
+                    $this->validateRequired($key, $data, $response);
+                    $this->validatePattern($rule, $data[$key], $key, $response);
+                }
+            }catch (ValidationException $exception){
+                //добавить логирование
+                echo $exception->getMessage();
             }
+
 
         }
 
@@ -46,6 +54,7 @@ class ValidateMiddleware extends Middleware
      * @param array $pattern
      * @param array $data
      * @param Response $response
+     * @throws ValidationException
      */
     private function validateAll(array $pattern, array $data, Response $response): void
     {

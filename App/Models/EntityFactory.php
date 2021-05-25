@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 /**
+ * Фабрика сушностей
  * Class EntityFactory
  * @package App\Models
  */
@@ -25,6 +26,11 @@ class EntityFactory
         );
     }
 
+    /**
+     * Создать из pdo-массива
+     * @param array $statement
+     * @return Entity
+     */
     public static function fromStatement(array $statement): Entity
     {
         return new Entity(

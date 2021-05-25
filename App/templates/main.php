@@ -12,9 +12,9 @@
     <a href="<?php echo DEV_HOST . '/entities/?page=' . $i . '&limit=' . $this->limit ?>"> <?php echo $i ; ?></a>
 <?php endfor;?>
 </div>
-<?php  foreach ($this->data as $datum): ?>
 <div class="card-container">
 <div class="cards-wrapper">
+<?php  foreach ($this->data as $datum): ?>
     <div class="entityCard<?php echo $datum->id ?> card-main">
     <hr>
     <p class="name"><?php  echo $datum->name ?></p>

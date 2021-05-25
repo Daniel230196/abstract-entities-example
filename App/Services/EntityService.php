@@ -18,13 +18,17 @@ use PDO;
 class EntityService implements ServiceInterface
 {
 
-    private string $tableName = 'entities';
+    /**
+     * @var string
+     */
+    private string $tableName;
 
     private Connection $connection;
     private PaginationService $paginator;
 
     public function __construct(PaginationService $paginator)
     {
+        $this->tableName = Entity::getTableName();
         $this->connection = Connection::getInstance();
         $this->paginator  = $paginator;
     }
@@ -52,20 +56,17 @@ class EntityService implements ServiceInterface
     public function findByText(array $text): array
     {
         $stmt = $this->connection->prepare("select * from {$this->tableName} where description like ?");
-
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $res = [];
+
         foreach ($text as $item){
-            $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $stmt->execute(['%'.$item.'%']);
-            $res += $this->createEntitiesStmt($stmt->fetchAll());
-            $stmt->execute(['%'.$item]);
-            $res += $this->createEntitiesStmt($stmt->fetchAll());
-            $stmt->execute([$item.'%']);
-            $res += $this->createEntitiesStmt($stmt->fetchAll());
+            $res = array_merge( $res, $this->createEntitiesStmt($stmt->fetchAll()));
         }
+
         return $res;
     }
-
+    
     /**
      * Получить сущности для страницы
      * @param int $limit
@@ -132,4 +133,5 @@ class EntityService implements ServiceInterface
         }
         return $result;
     }
+
 }

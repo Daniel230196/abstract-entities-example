@@ -8,7 +8,6 @@ class MainView extends View
 {
     private int $pages;
     private int $limit;
-    private CardView $card;
 
     public function __construct(array $viewData = [])
     {

@@ -32,16 +32,9 @@ class Router
     ];
 
 
-    /**
-     * Метод запроса
-     * @var string
-     */
-    private string $requestMethod;
 
-
-    public function __construct(string $requestUri)
+    public function __construct()
     {
-
     }
 
     /**

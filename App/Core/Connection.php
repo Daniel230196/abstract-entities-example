@@ -35,11 +35,6 @@ class Connection
            }
     }
 
-    public function getDatabaseName(): string
-    {
-        return $this->dbName;
-    }
-
     /**
      * Направляет все неизвестные классу методы в PDO, с проверкой на существование
      * @param string $method Название метода

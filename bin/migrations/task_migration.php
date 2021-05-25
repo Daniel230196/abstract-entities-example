@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Config;
 use App\Core\Connection;
+use App\Models\Entity;
 use Faker\Factory;
 
 require_once 'vendor/autoload.php';
@@ -16,7 +17,7 @@ $migration = new class
     public function __construct()
     {
         $this->connection = Connection::getInstance();
-        $this->name = $this->connection->getDatabaseName() . '.entities';
+        $this->name =  Entity::getTableName();
     }
 
     public function up()
