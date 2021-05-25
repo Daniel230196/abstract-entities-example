@@ -34,7 +34,7 @@ class OnlyAjaxMiddleware extends Middleware
                 $this->decodeFormData($request, 'post');
 
         }
-
+        $response->setHeader('Content-type: application/json');
         $this->then($request,$response);
     }
 

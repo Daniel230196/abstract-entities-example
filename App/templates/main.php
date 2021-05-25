@@ -12,14 +12,14 @@
     <a href="<?php echo DEV_HOST . '/entities/?page=' . $i . '&limit=' . $this->limit ?>"> <?php echo $i ; ?></a>
 <?php endfor;?>
 </div>
-<?php $i = 1; foreach ($this->data as $datum): ?>
+<?php  foreach ($this->data as $datum): ?>
 <div class="card-container">
 <div class="cards-wrapper">
     <div class="entityCard<?php echo $datum->id ?> card-main">
     <hr>
     <p class="name"><?php  echo $datum->name ?></p>
     <p class="created"><?php echo date_format($datum->created, 'Y-m-d H:i:s'); ?> </p>
-    <p><?php echo $datum->description; $i++?></p>
+    <p><?php echo $datum->description;?></p>
 
     <button id="<?php echo $datum->id ?>" class="b-close deleteButton">Удалить</button>
 </div>

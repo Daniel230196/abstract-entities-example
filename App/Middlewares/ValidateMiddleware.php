@@ -4,26 +4,34 @@
 namespace App\Middlewares;
 
 
+use App\Core\Exceptions\ValidationException;
 use Http\Request;
 use Http\Response;
 
 class ValidateMiddleware extends Middleware
 {
+    /**
+     * Константы для определения порядка валидации по регулярке
+     */
+    private const INVERT_PATTERN = 'no_reg';
+    private const PATTERN = 'reg';
 
     public function __invoke(Request $request, Response $response)
     {
 
-        foreach (static::$params as $key=>$rule) {
-            switch ($request->method){
+        foreach (static::$params as $key => $rule) {
+            switch ($request->method) {
                 case 'GET':
                     $data = $request->get;
+                    break;
                 default:
                     $data = $request->post;
+                    break;
             }
 
-            if($key === 'all'){
+            if ($key === 'all') {
                 $this->validateAll($rule, $data, $response);
-            }else{
+            } else {
                 $this->validateRequired($key, $data, $response);
                 $this->validatePattern($rule, $data[$key], $key, $response);
             }
@@ -35,38 +43,48 @@ class ValidateMiddleware extends Middleware
 
     /**
      * Валидация всех полей
-     * @param string $pattern
+     * @param array $pattern
      * @param array $data
      * @param Response $response
      */
-    private function validateAll(string $pattern, array $data, Response $response): void
+    private function validateAll(array $pattern, array $data, Response $response): void
     {
-        $result = 0;
-        foreach ($data as $item){
-            $result += preg_match($pattern, $item);
-        }
-
-        if($result > 0){
-            $response->setStatus(401);
-            $response->setStatusText('Incorrect character found');
-            $response->setContent('Invalid data');
+        foreach ($data as $key=>$item) {
+            $this->validatePattern($pattern, $item, $key, $response);
         }
     }
 
     /**
      * Валидация по руглярке
-     * @param string $pattern
+     * @param array $pattern
      * @param string $item
      * @param string $fieldName
      * @param Response $response
+     * @throws ValidationException
      */
-    private function validatePattern(string $pattern, string $item, string $fieldName, Response $response): void
+    private function validatePattern(array $pattern, string $item, string $fieldName, Response $response): void
     {
-        if(preg_match($pattern,$item)){
-            $response->setStatus(400);
-            $response->setContent(json_encode('Field ' . $fieldName . ' contains invalid symbols'));
-            $response->setStatusText('Invalid data');
+        foreach ($pattern as $key=>$value){
+            switch ($key){
+                case self::INVERT_PATTERN:
+                    if (preg_match($value, $item)) {
+                        $response->setStatus(400);
+                        $response->setContent(json_encode('Field ' . $fieldName . ' contains invalid symbols'));
+                        $response->setStatusText('Invalid data');
+                    }
+                    break;
+                case self::PATTERN:
+                    if (!preg_match($value, $item)) {
+                        $response->setStatus(400);
+                        $response->setContent(json_encode('Field ' . $fieldName . ' contains invalid symbols'));
+                        $response->setStatusText('Invalid data');
+                    }
+                    break;
+                default:
+                    throw new ValidationException('Unexpected value');
+            }
         }
+
     }
 
 
@@ -78,10 +96,11 @@ class ValidateMiddleware extends Middleware
      */
     private function validateRequired(string $requestKey, array $data, Response $response): void
     {
-        if(!isset($data[$requestKey])){
+        if (!isset($data[$requestKey])) {
             $response->setStatus(400);
             $response->setContent(json_encode('Field ' . $requestKey . ' is required'));
             $response->setStatusText('Invalid data');
         }
     }
+
 }

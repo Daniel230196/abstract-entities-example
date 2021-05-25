@@ -25,15 +25,15 @@ class EntityController extends BaseController
     protected array $middleware = [
         'create' => [
             OnlyAjaxMiddleware::class =>[],
-            ValidateMiddleware::class => ['name' => '/\'\";\(\)|\'\"|\"|\'|;/', 'description' => '/\'\";\(\)|\'\"|\"|\'|;/']
+            ValidateMiddleware::class => ['name' => ['no_reg' => '/\'\";\(\)|\'\"|\"|\'|;/'], 'description' => ['no_reg' => '/\'\";\(\)|\'\"|\"|\'|;/']]
         ],
         'delete' => [
             OnlyAjaxMiddleware::class =>[],
-            ValidateMiddleware::class => ['id' => '/\d/']
+            ValidateMiddleware::class => ['id' => ['reg' => '/\d/']]
         ],
         'find' => [
             OnlyAjaxMiddleware::class =>[],
-            ValidateMiddleware::class => ['all' => '/\'\";\(\)|\'\"|\"|\'|;/']
+            ValidateMiddleware::class => ['all' => ['no_reg' => '/\'\";\(\)|\'\"|\"|\'|;/']]
         ]
     ];
 
@@ -76,7 +76,8 @@ class EntityController extends BaseController
             return !empty($el);
         });
 
-        var_dump(static::$service->findByText($text));
+        $test = static::$service->findByText($text);
+        return json_encode($test,JSON_UNESCAPED_UNICODE);
     }
 
     /**

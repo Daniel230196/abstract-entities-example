@@ -13,15 +13,48 @@ const APP =  {
                     console.log(data);
                 })
             })
-
     },
 
+    init(){
+
+        let deleteButtons = document.querySelectorAll('.deleteButton');
+        for (let i = 0; i < deleteButtons.length; i++){
+
+            deleteButtons[i].addEventListener('click', (e) =>{
+                let id = e.target.id;
+                let card = document.querySelectorAll('.entityCard'+id)[0];
+                card.innerHTML = '<hr>';
+                let spinner = APP.spinner();
+                card.append(spinner);
+
+                APP.deleteEntity(id).then(
+
+                    resolve =>{
+                        setTimeout(() =>{
+                            card.removeChild(spinner);
+                            card.innerHTML = '<hr>';
+                            card.innerHTML += resolve;
+                        }, 500);
+
+                    },
+                    reject =>{
+                        setTimeout(() =>{
+                            card.removeChild(spinner);
+                            card.innerHTML = '<hr>';
+                            card.innerHTML += reject;
+                        }, 500);
+                    }
+                )
+            })
+        }
+    },
 
     modal: function(){
         const $modal =  createModal();
         const ANIM_SPEED = 200;
         let closing = false;
         let destroyed = false;
+        const spinner = APP.spinner();
         const modal = {
             open() {
                 if (!closing) {
@@ -47,12 +80,8 @@ const APP =  {
             },
 
             async send(){
-
                 let modalBody = $modal.querySelector('.modal-content');
-                let spinner   = document.createElement('div');
-                spinner.classList.add('spinner');
-                spinner.classList.add('modal');
-                modalBody.appendChild(spinner);
+                modalBody.appendChild(APP.spinner());
 
                 let name = $modal.querySelector('input').value;
                 let descr = $modal.querySelector('textarea').value;
@@ -72,7 +101,7 @@ const APP =  {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-Requested-with': 'XMLHttpRequest',
+                        'X-Requested-With': 'XMLHttpRequest',
                     }
                 })
                 return response.text();
@@ -83,7 +112,6 @@ const APP =  {
 
 
         const modalClickHandler = async (e)=>{
-
             if(e.target.dataset.close){
                 modal.close();
             }
@@ -91,10 +119,10 @@ const APP =  {
             if(e.target.dataset.send){
                 modal.send().then(resolve => {
                     setTimeout(() =>{
-                        let spinner = document.querySelector('.spinner');
                         let message = document.createElement('span')
                         message.innerHTML = '&#10003;' + resolve;
                         message.classList.add('success');
+                        console.log(spinner);
                         spinner.parentNode.append(message);
                         spinner.parentNode.removeChild(spinner);
                     }, 500);
@@ -102,7 +130,6 @@ const APP =  {
                 },
                 reject =>{
                     setTimeout(() =>{
-                        let spinner = document.querySelector('.spinner');
                         let message = document.createElement('span');
                         message.innerHTML = '&#10060;  ' + reject;
                         message.classList.add('error');
@@ -148,31 +175,36 @@ const APP =  {
         let findMode = false;
         const content = document.querySelector('.card-container');
         const spinner = APP.spinner();
+
         return {
             start(){
                 if(!findMode){
-                    let cards = document.querySelector('.cards-wrapper');
+                    let cards = this.getCards();
                     cards.parentNode.removeChild(cards);
                 }
                 let data = document.querySelector('#find').value;
                 this.send(data).then(
                     resolve =>{
-                        content.removeChild(spinner);
-                        console.log(resolve)
-
+                        setTimeout(()=>{
+                            content.removeChild(spinner);
+                        }, 200)
+                        this.render(resolve);
                     },
                     reject=>{
-                        console.log(JSON.parse(reject))
+                        setTimeout(()=>{
+                            content.removeChild(spinner);
+                        }, 200)
+                        this.render(JSON.stringify([reject]));
                     }
                 )
             },
 
             async send(data){
                 findMode = true;
-                if(!data.match(/[a-zа-я0-9\s]+/i)){
-                    throw 'Недопустимые символы в запросе!';
-                }else if(!data){
-                    throw 'Пустой запрос';
+                if(!data){
+                    throw 'Пустой запрос!';
+                }else if(!data.match(/[a-zа-я0-9\s]+/i) || data.match(/[';":]/)){
+                    throw 'Недопустимые символы в запросе';
                 }
 
                 content.append(spinner);
@@ -182,64 +214,63 @@ const APP =  {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-Requested-with': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                return response.json();
+
+                return response.text();
+            },
+
+            render(entityData){
+                entityData = JSON.parse(entityData);
+                let layout = document.createElement('div');
+                layout.classList.add('cards-wrapper');
+                content.appendChild(layout);
+
+                entityData.forEach(entity=>{
+
+                    let html = `
+                                <div class="${'entityCard' + entity.id + ' card-main'}">
+                                <hr>
+                                <p class="name"> ${entity.name} </p>
+                                <p class="created"> ${entity.created.date} </p>
+                                <p> ${entity.description}</p>
+                                <button id="${entity.id}" class="b-close deleteButton">Удалить</button>
+                            `;
+                    layout.insertAdjacentHTML('afterbegin',html);
+                });
+                APP.init();
+                findMode = false;
+
+            },
+
+            getCards(){
+                return document.querySelector('.cards-wrapper');
             }
         }
     }
 
 }
-const findMode = APP.findMode();
-let findBtn = document.getElementById('find-btn');
-findBtn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    findMode.start();
-})
-
-let deleteButtons = document.querySelectorAll('.deleteButton');
 
 
-for (let i = 0; i < deleteButtons.length; i++){
-
-    deleteButtons[i].addEventListener('click', (e) =>{
-        let id = e.target.id;
-        let card = document.querySelectorAll('.entityCard'+id)[0];
-        card.innerHTML = '<hr>';
-        let spinner = APP.spinner();
-        card.append(spinner);
-
-        APP.deleteEntity(id).then(
-
-            resolve =>{
-                setTimeout(() =>{
-                    card.removeChild(spinner);
-                    card.innerHTML = '<hr>';
-                    card.innerHTML += resolve;
-                }, 500);
-
-            },
-            reject =>{
-                setTimeout(() =>{
-                    card.removeChild(spinner);
-                    card.innerHTML = '<hr>';
-                    card.innerHTML += reject;
-                }, 500);
-            }
-        )
+document.addEventListener('DOMContentLoaded', ()=>{
+    APP.init();
+    const findMode = APP.findMode();
+    let findBtn = document.getElementById('find-btn');
+    findBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        findMode.start();
     })
-}
 
+    let modalBtn = document.querySelector('.addEntity');
 
-
-
-let modalBtn = document.querySelector('.addEntity');
-
-modalBtn.addEventListener('click', (e) =>{
-    let $modal = APP.modal();
-    setTimeout(function(){
-        $modal.open();
-     }, 10);
+    modalBtn.addEventListener('click', (e) =>{
+        let $modal = APP.modal();
+        setTimeout(function(){
+            $modal.open();
+        }, 10);
+    })
 })
+
+
 
