@@ -32,6 +32,9 @@ class EntityController extends BaseController
         'find' => [
             OnlyAjaxMiddleware::class =>[],
             ValidateMiddleware::class => ['all' => ['no_reg' => '/\'\";\(\)|\'\"|\"|\'|;/']]
+        ],
+        'default' => [
+            ValidateMiddleware::class=> ['all' => ['reg' => '/\d/']]
         ]
     ];
 
@@ -48,7 +51,7 @@ class EntityController extends BaseController
         $page = $this->request->get['page'] ?? self::PAGE;
         $limit = $this->request->get['limit'] ?? self:: LIMIT;
 
-        $data = static::$service->byPage($limit, $page);
+        $data = static::$service->byPage((int)$limit, (int)$page);
 
         $this->view('main', $data);
 
@@ -85,7 +88,7 @@ class EntityController extends BaseController
     public function delete(): string
     {
         $data = $this->request->post;
-        static::$service->delete($data['id']);
+        static::$service->delete((int)$data['id']);
         return 'Сущность удалена';
     }
 
